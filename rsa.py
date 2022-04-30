@@ -1,3 +1,7 @@
+"""
+RSA encryption method implementation for terminal chat.
+"""
+
 import random
 import math
 
