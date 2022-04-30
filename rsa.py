@@ -167,11 +167,11 @@ def _into_blocks(msg: str) -> list[str]:
     Returns:
         list[str]: List of blocks.
     """
-    i = 2
+    i = 5
     blocks = [NUMS_DICT[char] for char in msg]
     while i < len(blocks):
         blocks.insert(i, "*")
-        i += 3
+        i += 6
     blocks = "".join(blocks).split("*")
     return blocks
 
