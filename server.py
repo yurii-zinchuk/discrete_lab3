@@ -25,7 +25,7 @@ class Server:
             cli, addr = self.sock.accept()
             username = cli.recv(1024).decode()
             print(f"{username} tries to connect")
-            # self.broadcast(f'new person has joined: {username}')
+            self.broadcast(f"new person has joined: {username}")
             self.username_lookup[cli] = username
             self.clients.append(cli)
 
@@ -38,10 +38,10 @@ class Server:
             cli_public = (int(pub_c[0]), int(pub_c[1]))
 
             # encrypt server secret with client public
-            encrypted_secret = rsa_encrypt(d, cli_public)
+            encrypted_secret = rsa_encrypt(str(d), cli_public)
 
             # send encrypted server secret to client
-            cli.send(str(encrypted_secret).encode())
+            cli.send(encrypted_secret.encode())
 
             threading.Thread(
                 target=self.handle_client,
@@ -53,11 +53,8 @@ class Server:
 
     def broadcast(self, msg: str):
         for client in self.clients:
-
-            # encrypt message
             encrypted_msg = rsa_encrypt(msg, self.public)
-            # send message
-            client.send(str(encrypted_msg).encode())
+            client.send(encrypted_msg.encode())
 
     def handle_client(self, cli: socket, addr):
         while True:

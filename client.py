@@ -32,8 +32,8 @@ class Client:
         self.sock.send(public.encode())
 
         # receive encrypted server secret from server
-        serv_se = int(self.sock.recv(1024).decode())
-        self.serv_sd = rsa_decrypt(serv_se, d, (n, e))
+        serv_se = self.sock.recv(1024).decode()
+        self.serv_sd = int(rsa_decrypt(serv_se, d, (n, e)))
         print("Ready to chat.")
 
         message_handler = threading.Thread(target=self.read_handler, args=())
@@ -43,7 +43,7 @@ class Client:
 
     def read_handler(self):
         while True:
-            encrypted_message = int(self.sock.recv(1024).decode())
+            encrypted_message = self.sock.recv(1024).decode()
 
             # decrypt message with the secrete key
             decrypted_msg = rsa_decrypt(
@@ -51,14 +51,13 @@ class Client:
 
             print(decrypted_msg)
 
+
     def write_handler(self):
         while True:
             message = input()
 
-            # encrypt message with the secrete key
             encrypted_msg = rsa_encrypt(message, self.serv_pub)
-            # send message
-            self.sock.send(str(encrypted_msg).encode())
+            self.sock.send(encrypted_msg.encode())
 
 
 if __name__ == "__main__":
