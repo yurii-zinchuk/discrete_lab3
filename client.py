@@ -51,8 +51,11 @@ class Client:
             decrypted_msg = rsa_decrypt(
                 enc_message, self.serv_sd, self.serv_pub)
 
-            
-            print(decrypted_msg)
+            new_hash = sha256(decrypted_msg.encode()).hexdigest()
+            if old_hash == new_hash:
+                print('-->', decrypted_msg)
+            else:
+                print('--> Message is corrupted')
 
 
     def write_handler(self):
