@@ -1,5 +1,6 @@
 import socket
 import threading
+from hashlib import sha256
 from rsa import generate_keys, rsa_decrypt, rsa_encrypt
 
 
@@ -43,21 +44,28 @@ class Client:
 
     def read_handler(self):
         while True:
-            encrypted_message = self.sock.recv(1024).decode()
+            received = self.sock.recv(1024).decode()
+            encrypted_message, initial_hash = received.split("&")
 
             # decrypt message with the secrete key
             decrypted_msg = rsa_decrypt(
                 encrypted_message, self.serv_sd, self.serv_pub)
 
-            print(decrypted_msg)
+            latest_hash = sha256(decrypted_msg.encode()).hexdigest()
+            if not initial_hash == latest_hash:
+                raise ValueError("Bad encoding, different hash.")
+
+            print(self.username+":", decrypted_msg)
 
 
     def write_handler(self):
         while True:
-            message = input()
+            message = input("me: ")
 
+            initial_hash = sha256(message.encode()).hexdigest()
             encrypted_msg = rsa_encrypt(message, self.serv_pub)
-            self.sock.send(encrypted_msg.encode())
+
+            self.sock.send(str(encrypted_msg+"&"+initial_hash).encode())
 
 
 if __name__ == "__main__":
