@@ -1,5 +1,6 @@
 import socket
 import threading
+from hashlib import sha256
 from rsa import generate_keys, rsa_decrypt, rsa_encrypt
 
 
@@ -44,11 +45,13 @@ class Client:
     def read_handler(self):
         while True:
             encrypted_message = self.sock.recv(1024).decode()
+            enc_message, old_hash = encrypted_message.split('|')
 
             # decrypt message with the secrete key
             decrypted_msg = rsa_decrypt(
-                encrypted_message, self.serv_sd, self.serv_pub)
+                enc_message, self.serv_sd, self.serv_pub)
 
+            
             print(decrypted_msg)
 
 
@@ -56,7 +59,7 @@ class Client:
         while True:
             message = input()
 
-            encrypted_msg = rsa_encrypt(message, self.serv_pub)
+            encrypted_msg = rsa_encrypt(message, self.serv_pub) + '|' + sha256(message.encode()).hexdigest() 
             self.sock.send(encrypted_msg.encode())
 
 
