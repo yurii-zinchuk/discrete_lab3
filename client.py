@@ -45,15 +45,15 @@ class Client:
     def read_handler(self):
         while True:
             encrypted_message = self.sock.recv(1024).decode()
-            enc_message, old_hash = encrypted_message.split('|')
+            enc_message, old_hash = encrypted_message.split('&')
 
             # decrypt message with the secrete key
-            decrypted_msg, replier_name = rsa_decrypt(
-                enc_message, self.serv_sd, self.serv_pub).split('|')
+            decrypted_msg = rsa_decrypt(
+                enc_message, self.serv_sd, self.serv_pub)
 
             new_hash = sha256(decrypted_msg.encode()).hexdigest()
             if old_hash == new_hash:
-                print(replier_name, '-->', decrypted_msg)
+                print('-->', decrypted_msg)
             else:
                 print('--> Message is corrupted')
 
@@ -62,7 +62,7 @@ class Client:
         while True:
             message = input() + '|' + name
 
-            encrypted_msg = rsa_encrypt(message, self.serv_pub) + '|' + sha256(message.encode()).hexdigest() 
+            encrypted_msg = rsa_encrypt(message, self.serv_pub) + '&' + sha256(message.encode()).hexdigest() 
             self.sock.send(encrypted_msg.encode())
 
 

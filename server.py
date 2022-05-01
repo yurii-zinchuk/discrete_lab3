@@ -54,7 +54,7 @@ class Server:
 
     def broadcast(self, msg: str):
         for client in self.clients:
-            encrypted_msg = rsa_encrypt(msg, self.public) + '|' + sha256(msg.encode()).hexdigest()
+            encrypted_msg = rsa_encrypt(msg, self.public) + '&' + sha256(msg.encode()).hexdigest()
             client.send(encrypted_msg.encode())
 
     def handle_client(self, cli: socket, addr):
