@@ -53,14 +53,14 @@ class Client:
 
             new_hash = sha256(decrypted_msg.encode()).hexdigest()
             if old_hash == new_hash:
-                print('-->', decrypted_msg)
+                print('-->', decrypted_msg.replace('|', ': '))
             else:
                 print('--> Message is corrupted')
 
 
     def write_handler(self):
         while True:
-            message = input() + '|' + name
+            message = name + '|' + input()
 
             encrypted_msg = rsa_encrypt(message, self.serv_pub) + '&' + sha256(message.encode()).hexdigest() 
             self.sock.send(encrypted_msg.encode())
