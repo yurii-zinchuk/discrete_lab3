@@ -48,24 +48,25 @@ class Client:
             enc_message, old_hash = encrypted_message.split('|')
 
             # decrypt message with the secrete key
-            decrypted_msg = rsa_decrypt(
-                enc_message, self.serv_sd, self.serv_pub)
+            decrypted_msg, replier_name = rsa_decrypt(
+                enc_message, self.serv_sd, self.serv_pub).split('|')
 
             new_hash = sha256(decrypted_msg.encode()).hexdigest()
             if old_hash == new_hash:
-                print('-->', decrypted_msg)
+                print(replier_name, '-->', decrypted_msg)
             else:
                 print('--> Message is corrupted')
 
 
     def write_handler(self):
         while True:
-            message = input()
+            message = input() + '|' + name
 
             encrypted_msg = rsa_encrypt(message, self.serv_pub) + '|' + sha256(message.encode()).hexdigest() 
             self.sock.send(encrypted_msg.encode())
 
 
 if __name__ == "__main__":
-    cl = Client("127.0.0.1", 9001, "yz")
+    name = input('Please write your name: ')
+    cl = Client("127.0.0.1", 9001, name)
     cl.init_connection()
