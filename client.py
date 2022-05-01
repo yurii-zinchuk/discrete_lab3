@@ -55,12 +55,12 @@ class Client:
             if not initial_hash == latest_hash:
                 raise ValueError("Bad encoding, different hash.")
 
-            print(self.username+":", decrypted_msg)
+            print(decrypted_msg)
 
 
     def write_handler(self):
         while True:
-            message = input("me: ")
+            message = input()
 
             initial_hash = sha256(message.encode()).hexdigest()
             encrypted_msg = rsa_encrypt(message, self.serv_pub)
